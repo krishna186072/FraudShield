@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Feedbacks - FraudShield Admin</title>
+    <link rel="stylesheet" href="{% static 'admin/admin_theme.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                    <ion-icon name="arrow-back-outline"></ion-icon> Back to Dashboard
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="welcome-banner">
+                <h1>User <span class="highlight">Feedbacks</span></h1>
+                <p>Review and reply to user inquiries.</p>
+            </div>
+
+            <div class="feedbacks-container">
+                <!-- Pending Feedbacks -->
+                <h2 style="margin-bottom: 1.5rem;">Pending Inquiries</h2>
+                {% for feedback in pending_feedbacks %}
+                <div class="feedback-item">
+                    <div class="feedback-header" style="justify-content: space-between; align-items: start;">
+                        <div class="user-info">
+                            <h3>{{ feedback.user.username }}</h3>
+                            <span>{{ feedback.user.email }}</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">
+                                {{ feedback.created_at|date:"M d, Y" }}
+                            </span>
+                            <form action="{% url 'delete_feedback' feedback.id %}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to delete this feedback?');"
+                                style="margin-top: 5px;">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    style="background: none; border: none; color: #dc2626; cursor: pointer; font-size: 0.85rem; padding: 0; display: flex; align-items: center; gap: 4px; float: right;">
+                                    <ion-icon name="trash-outline"></ion-icon> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="feedback-text">
+                        <p>{{ feedback.message }}</p>
+                    </div>
+                    <div class="reply-section">
+                        <form action="{% url 'reply_feedback' feedback.id %}" method="POST">
+                            {% csrf_token %}
+                            <textarea name="reply" class="reply-input" placeholder="Write a reply..."
+                                required></textarea>
+                            <div class="reply-actions">
+                                <button type="submit" class="btn btn-primary"
+                                    style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Reply</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="text-align: center; margin-bottom: 2rem; color: var(--text-muted);">No pending inquiries.</p>
+                {% endfor %}
+
+                <!-- Replied Feedbacks -->
+                <h2
+                    style="margin-top: 3rem; margin-bottom: 1.5rem; border-top: 1px solid var(--border); padding-top: 3rem;">
+                    Replied Inquiries</h2>
+                {% for feedback in replied_feedbacks %}
+                <div class="feedback-item" style="border-left: 4px solid var(--accent);">
+                    <div class="feedback-header" style="justify-content: space-between; align-items: start;">
+                        <div class="user-info">
+                            <h3>{{ feedback.user.username }}</h3>
+                            <span>{{ feedback.user.email }}</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">
+                                {{ feedback.created_at|date:"M d, Y" }}
+                            </span>
+                            <form action="{% url 'delete_feedback' feedback.id %}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to delete this feedback?');"
+                                style="margin-top: 5px;">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    style="background: none; border: none; color: #dc2626; cursor: pointer; font-size: 0.85rem; padding: 0; display: flex; align-items: center; gap: 4px; float: right;">
+                                    <ion-icon name="trash-outline"></ion-icon> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="feedback-text">
+                        <p>{{ feedback.message }}</p>
+                    </div>
+                    <div class="reply-section"
+                        style="background: rgba(5, 150, 105, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <p style="margin: 0;"><strong>Admin Reply:</strong> {{ feedback.admin_reply }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="text-align: center; color: var(--text-muted);">No replied inquiries yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

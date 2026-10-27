@@ -1,0 +1,101 @@
+/* Dashboard Styles - Consistent with Home */
+@import url('style.css');
+
+/* Page Specific Dashboard Styles */
+.dashboard-section {
+    flex: 1;
+    padding: 8rem 0 4rem;
+    background: radial-gradient(circle at center top, rgba(5, 150, 105, 0.1) 0%, transparent 50%);
+}
+
+.welcome-banner {
+    margin-bottom: 5rem;
+}
+
+.welcome-banner h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-banner p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Action Cards */
+.dashboard-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Fixed 3 Columns */
+    gap: 1.5rem;
+    /* Compact gap */
+}
+
+.action-card {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    padding: 2rem 1.5rem;
+    /* Compact padding */
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 280px;
+    /* Restored height */
+    justify-content: space-between;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card-icon {
+    width: 70px;
+    /* Restored icon container */
+    height: 70px;
+    background: rgba(5, 150, 105, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    /* Restored icon */
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.action-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+    /* Restored title */
+    font-weight: 600;
+}
+
+.action-card p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    font-size: 0.95rem;
+    /* Restored text */
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .dashboard-actions {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 columns on tablets */
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-actions {
+        grid-template-columns: 1fr;
+        /* 1 column on mobile */
+    }
+}

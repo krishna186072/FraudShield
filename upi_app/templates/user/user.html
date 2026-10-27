@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/user.css' %}">
+    <!-- Ionicons for premium icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <!-- Right side actions -->
+                <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="{% url 'about' %}"
+                        style="text-decoration: none; color: #94a3b8; font-weight: 500; transition: color 0.3s;">About
+                        Us</a>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">
+                        Logout <ion-icon name="log-out-outline"></ion-icon>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Popup Notification Container -->
+    {% if messages %}
+    <div id="popup-container" class="popup-container">
+        {% for message in messages %}
+        <div class="popup-message {{ message.tags }}">
+            <div class="popup-icon">
+                {% if message.tags == 'success' %}
+                <ion-icon name="checkmark-circle"></ion-icon>
+                {% elif message.tags == 'error' %}
+                <ion-icon name="alert-circle"></ion-icon>
+                {% else %}
+                <ion-icon name="information-circle"></ion-icon>
+                {% endif %}
+            </div>
+            <div class="popup-content">
+                <h4>{{ message.tags|title }}</h4>
+                <p>{{ message }}</p>
+            </div>
+            <button class="popup-close" onclick="closePopup(this)">
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // Auto-close popup after 5 seconds
+        setTimeout(() => {
+            const popups = document.querySelectorAll('.popup-message');
+            popups.forEach(popup => {
+                popup.style.opacity = '0';
+                setTimeout(() => popup.remove(), 500);
+            });
+        }, 5000);
+
+        function closePopup(btn) {
+            const popup = btn.parentElement;
+            popup.style.opacity = '0';
+            setTimeout(() => popup.remove(), 500);
+        }
+    </script>
+
+    <style>
+        .popup-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .popup-message {
+            background: rgba(18, 18, 24, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 300px;
+            animation: slideIn 0.5s ease-out forwards;
+            color: #fff;
+        }
+
+        .popup-message.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .popup-message.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .popup-message.warning {
+            border-left: 4px solid #f97316;
+        }
+
+        .popup-icon ion-icon {
+            font-size: 1.8rem;
+        }
+
+        .popup-message.success .popup-icon {
+            color: #22c55e;
+        }
+
+        .popup-message.error .popup-icon {
+            color: #ef4444;
+        }
+
+        .popup-content h4 {
+            margin: 0 0 4px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .popup-content p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #a1a1aa;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            color: #71717a;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: auto;
+            padding: 4px;
+            display: flex;
+            transition: color 0.2s;
+        }
+
+        .popup-close:hover {
+            color: #fff;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+    {% endif %}
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="welcome-banner">
+                <h1>Welcome <span class="highlight">{{ user.username|title }}</span></h1>
+                <p>UPI ID: {{ user.profile.upi_id }}</p>
+            </div>
+
+            <div class="dashboard-actions">
+                <!-- Send Money Card -->
+                <div class="action-card">
+                    <div class="card-icon">
+                        <ion-icon name="paper-plane-outline"></ion-icon>
+                    </div>
+                    <h3>Send Money</h3>
+                    <p>Transfer funds securely to any UPI ID or Bank Account.</p>
+                    <a href="{% url 'send_money' %}" class="btn btn-primary width-100">Send Now</a>
+                </div>
+
+                <!-- View Balance Card -->
+                <div class="action-card">
+                    <div class="card-icon">
+                        <ion-icon name="wallet-outline"></ion-icon>
+                    </div>
+                    <h3>Show Balance</h3>
+                    <p>Check your current account balance and savings.</p>
+                    <a href="{% url 'balance' %}" class="btn btn-primary width-100">Check Balance</a>
+                </div>
+
+                <!-- Transaction History Card -->
+                <div class="action-card">
+                    <div class="card-icon">
+                        <ion-icon name="time-outline"></ion-icon>
+                    </div>
+                    <h3>Transaction History</h3>
+                    <p>Review your past payments and income details.</p>
+                    <a href="{% url 'history' %}" class="btn btn-primary width-100">View History</a>
+                </div>
+
+                <!-- Send Feedback Card -->
+                <div class="action-card">
+                    <div class="card-icon">
+                        <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+                    </div>
+                    <h3>Send Feedback</h3>
+                    <p>Help us improve your experience with FraudShield.</p>
+                    <a href="{% url 'feedback' %}" class="btn btn-primary width-100">Feedback</a>
+                </div>
+
+                <!-- Expense Summary Card -->
+                <div class="action-card">
+                    <div class="card-icon">
+                        <ion-icon name="pie-chart-outline"></ion-icon>
+                    </div>
+                    <h3>Expense Summary</h3>
+                    <p>Analyze your spending habits by category.</p>
+                    <a href="{% url 'expense_summary' %}" class="btn btn-primary width-100">View Summary</a>
+                </div>
+
+                <!-- User Profile Card -->
+                <div class="action-card">
+                    <div class="card-icon">
+                        <ion-icon name="person-outline"></ion-icon>
+                    </div>
+                    <h3>User Profile</h3>
+                    <p>Manage your account details and security settings.</p>
+                    <a href="{% url 'profile' %}" class="btn btn-primary width-100">View Profile</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <ion-icon name="shield-checkmark"></ion-icon>
+                        FraudShield
+                    </div>
+                    <p>Making digital payments safe for everyone. Join the secure revolution today.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><ion-icon name="call-outline"></ion-icon> 9645626283</p>
+                    <p><ion-icon name="mail-outline"></ion-icon> fraudshield@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

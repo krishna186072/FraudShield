@@ -1,0 +1,324 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Money - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/send.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="{% url 'user_dashboard' %}"
+                        style="text-decoration: none; color: #94a3b8; font-weight: 500; transition: color 0.3s;">Dashboard</a>
+                    <a href="{% url 'about' %}"
+                        style="text-decoration: none; color: #94a3b8; font-weight: 500; transition: color 0.3s;">About
+                        Us</a>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        Logout <ion-icon name="log-out-outline"></ion-icon>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Popup Notification Container -->
+    {% if messages %}
+    <div id="popup-container" class="popup-container">
+        {% for message in messages %}
+        <div class="popup-message {{ message.tags }}">
+            <div class="popup-icon">
+                {% if message.tags == 'success' %}
+                <ion-icon name="checkmark-circle"></ion-icon>
+                {% elif message.tags == 'error' %}
+                <ion-icon name="alert-circle"></ion-icon>
+                {% else %}
+                <ion-icon name="information-circle"></ion-icon>
+                {% endif %}
+            </div>
+            <div class="popup-content">
+                <h4>{{ message.tags|title }}</h4>
+                <p>{{ message }}</p>
+            </div>
+            <button class="popup-close" onclick="closePopup(this)">
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        setTimeout(() => {
+            const popups = document.querySelectorAll('.popup-message');
+            popups.forEach(popup => {
+                popup.style.opacity = '0';
+                setTimeout(() => popup.remove(), 500);
+            });
+        }, 5000);
+
+        function closePopup(btn) {
+            const popup = btn.parentElement;
+            popup.style.opacity = '0';
+            setTimeout(() => popup.remove(), 500);
+        }
+    </script>
+
+    <style>
+        .popup-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .popup-message {
+            background: rgba(18, 18, 24, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 300px;
+            animation: slideIn 0.5s ease-out forwards;
+            color: #fff;
+        }
+
+        .popup-message.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .popup-message.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .popup-message.warning {
+            border-left: 4px solid #f97316;
+        }
+
+        .popup-icon ion-icon {
+            font-size: 1.8rem;
+        }
+
+        .popup-message.success .popup-icon {
+            color: #22c55e;
+        }
+
+        .popup-message.error .popup-icon {
+            color: #ef4444;
+        }
+
+        .popup-content h4 {
+            margin: 0 0 4px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .popup-content p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #a1a1aa;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            color: #71717a;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: auto;
+            padding: 4px;
+            display: flex;
+            transition: color 0.2s;
+        }
+
+        .popup-close:hover {
+            color: #fff;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+    {% endif %}
+
+    <section class="send-section">
+        <div class="container">
+            <div class="send-card">
+                <h2>Send Money</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <label>UPI ID</label>
+                        <div class="input-wrapper">
+                            <ion-icon name="at-outline"></ion-icon>
+                            <input type="text" name="upi_id" placeholder="receiver@upi" required>
+                        </div>
+                        <div id="receiver-info"
+                            style="display:none; font-size: 0.85rem; margin-top: 5px; color: #a1a1aa; padding-left: 5px;">
+                            <!-- Content injected via JS -->
+                        </div>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const upiInput = document.querySelector('input[name="upi_id"]');
+                            const infoDiv = document.getElementById('receiver-info');
+                            let timeout = null;
+
+                            upiInput.addEventListener('input', function () {
+                                clearTimeout(timeout);
+                                // Debounce to avoid too many requests
+                                timeout = setTimeout(() => fetchDetails(this.value), 500);
+                            });
+
+                            upiInput.addEventListener('blur', function () {
+                                fetchDetails(this.value);
+                            });
+
+                            function fetchDetails(upiId) {
+                                if (!upiId.includes('@')) {
+                                    infoDiv.style.display = 'none';
+                                    return;
+                                }
+
+                                fetch(`/api/get-receiver-details/?upi_id=${encodeURIComponent(upiId)}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            infoDiv.style.display = 'block';
+                                            let verifiedHtml = '';
+                                            if (data.is_verified) {
+                                                verifiedHtml = `
+                                                    <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: inline-block;">
+                                                        <span style="color: #22c55e; font-weight: 600; font-size: 0.9rem;">
+                                                            <ion-icon name="checkmark-circle" style="vertical-align: middle; font-size: 1.2rem;"></ion-icon> 
+                                                            FraudShield Verified User
+                                                        </span>
+                                                    </div><br>
+                                                `;
+                                            }
+
+                                            infoDiv.innerHTML = `
+                                                ${verifiedHtml}
+                                                <span style="color: #22c55e;">
+                                                    Receiver: <strong>${data.name}</strong>
+                                                </span><br>
+                                                <span style="color: #60a5fa;">
+                                                    <ion-icon name="location-outline" style="vertical-align: middle;"></ion-icon> 
+                                                    Location: <strong>${data.location}</strong>
+                                                </span>
+                                            `;
+                                        } else {
+                                            infoDiv.style.display = 'block';
+                                            infoDiv.innerHTML = `<span style="color: #ef4444;">${data.error}</span>`;
+                                        }
+                                    })
+                                    .catch(err => console.error("API Error:", err));
+                            }
+                        });
+                    </script>
+                    <div class="input-group">
+                        <label>Amount (₹)</label>
+                        <div class="input-wrapper">
+                            <span class="rupee-icon">₹</span>
+                            <input type="number" name="amount" placeholder="0.00" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Description</label>
+                        <div class="input-wrapper">
+                            <ion-icon name="text-outline"></ion-icon>
+                            <input type="text" name="description" placeholder="Payment for...">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Category</label>
+                        <div class="input-wrapper">
+                            <ion-icon name="grid-outline"></ion-icon>
+                            <select name="category" required
+                                style="width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; background: rgba(2, 6, 23, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: #fff; font-size: 1rem; appearance: none; -webkit-appearance: none; cursor: pointer;">
+                                <option value="" disabled selected style="background: #1e1e24; color: #aaa;">Select
+                                    Category</option>
+                                <option value="Personal Transfers" style="background: #1e1e24;">Personal transfers
+                                </option>
+                                <option value="Households & Daily Needs" style="background: #1e1e24;">Households & daily
+                                    needs</option>
+                                <option value="Education" style="background: #1e1e24;">Education</option>
+                                <option value="Healthcare" style="background: #1e1e24;">Healthcare</option>
+                                <option value="Travel & Transport" style="background: #1e1e24;">Travel & transport
+                                </option>
+                                <option value="Shopping & Services" style="background: #1e1e24;">Shopping & services
+                                </option>
+                                <option value="Business & Investment" style="background: #1e1e24;">Business & investment
+                                </option>
+                                <option value="Donations & Others" style="background: #1e1e24;">Donations & others
+                                </option>
+                            </select>
+                            <ion-icon name="chevron-down-outline"
+                                style="left: auto; right: 1rem; pointer-events: none;"></ion-icon>
+                        </div>
+                    </div>
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+
+                    <div class="action-buttons">
+                        <a href="{% url 'user_dashboard' %}" class="btn btn-secondary width-100"
+                            style="text-align:center;">Cancel</a>
+                        <button type="submit" class="btn btn-primary width-100">Send</button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <ion-icon name="shield-checkmark"></ion-icon>
+                        FraudShield
+                    </div>
+                    <p>Making digital payments safe for everyone. Join the secure revolution today.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><ion-icon name="call-outline"></ion-icon> 9645626283</p>
+                    <p><ion-icon name="mail-outline"></ion-icon> fraudshield@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

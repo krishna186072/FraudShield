@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Verification - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/user.css' %}"> <!-- Reuse dashboard styles -->
+    <style>
+        .verification-container {
+            max-width: 500px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .warning-icon {
+            font-size: 3rem;
+            color: #ff4444;
+            margin-bottom: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .otp-display {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 1.5rem 0;
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="verification-container">
+        <div class="warning-icon">⚠️</div>
+        <h2 style="color: #ff4444;">High Risk Detected</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+            Our AI security system has flagged this transaction as highly suspicious.
+            <br>Is this an emergency payment?
+        </p>
+
+        <div id="initial-step">
+            <button class="btn btn-primary" onclick="startVerification()">Confirm Emergency Payment</button>
+            <a href="{% url 'user_dashboard' %}" class="btn btn-secondary"
+                style="margin-top: 1rem; display: inline-block;">Cancel</a>
+        </div>
+
+        <div id="otp-step" class="hidden">
+            <p id="otp-status">Generating Verification Code...</p>
+            <div id="otp-code-display" class="hidden otp-display"></div>
+
+            <form action="{% url 'finalize_emergency_pay' txn.id %}" method="POST" id="verification-form"
+                class="hidden">
+                {% csrf_token %}
+                <input type="hidden" name="generated_otp" id="generated_otp">
+
+                <div class="input-group" style="margin-bottom: 1rem;">
+                    <label>Enter the Code Above</label>
+                    <input type="text" name="user_otp" required placeholder="6-digit code">
+                </div>
+
+                <button type="submit" class="btn btn-primary width-100" style="background: #ff4444;">Finalize
+                    Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function startVerification() {
+            document.getElementById('initial-step').classList.add('hidden');
+            document.getElementById('otp-step').classList.remove('hidden');
+
+            // Wait 3 seconds then generate OTP
+            setTimeout(() => {
+                const otp = Math.floor(100000 + Math.random() * 900000);
+
+                document.getElementById('otp-status').innerText = "Verification Code:";
+                document.getElementById('otp-code-display').innerText = otp;
+                document.getElementById('otp-code-display').classList.remove('hidden');
+
+                // Set hidden input
+                document.getElementById('generated_otp').value = otp;
+
+                // Show form
+                document.getElementById('verification-form').classList.remove('hidden');
+            }, 3000);
+        }
+    </script>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <ion-icon name="shield-checkmark"></ion-icon>
+                        FraudShield
+                    </div>
+                    <p>Making digital payments safe for everyone. Join the secure revolution today.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><ion-icon name="call-outline"></ion-icon> 9645626283</p>
+                    <p><ion-icon name="mail-outline"></ion-icon> fraudshield@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

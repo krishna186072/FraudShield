@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - FraudShield Admin</title>
+    <link rel="stylesheet" href="{% static 'admin/admin_theme.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                    <ion-icon name="arrow-back-outline"></ion-icon> Back to Dashboard
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="welcome-banner">
+                <h1>Manage <span class="highlight">Users</span></h1>
+                <p>View and manage registered users.</p>
+            </div>
+
+            <!-- Merchants Section -->
+            <h2 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--text-main); font-size: 1.5rem;">Pending &
+                Verified Merchants</h2>
+
+            {% if merchants %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Owner Name</th>
+                            <th>Business Details</th>
+                            <th>Registration No</th>
+                            <th>Phone No</th>
+                            <th>AI Verification</th>
+                            <th>Status & Doc</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile in merchants %}
+                        <tr class="user-row">
+                            <td>
+                                {{ profile.user.username }}<br>
+                                <small style="color: var(--text-muted);">{{ profile.user.email }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ profile.business_name }}</strong><br>
+                                <small style="color: var(--text-muted);">{{ profile.business_category }}</small>
+                            </td>
+                            <td>{{ profile.registration_number }}</td>
+                            <td>{{ profile.phone_number|default:"-" }}</td>
+                            <td>
+                                {% if profile.notes_list %}
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85em;">
+                                    {% for note in profile.notes_list %}
+                                    <li style="margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
+                                        <ion-icon name="checkmark-circle"
+                                            style="color: #10b981; min-width: 14px;"></ion-icon>
+                                        <span style="color: var(--text-main);">{{ note }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <span style="color: var(--text-muted);">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if profile.verification_status == 'VERIFIED' %}
+                                <span style="color: #10b981; font-weight: 500;">Verified</span>
+                                {% elif profile.verification_status == 'REJECTED' %}
+                                <span style="color: #ef4444; font-weight: 500;">Rejected</span>
+                                {% else %}
+                                <span style="color: #f59e0b; font-weight: 500;">Pending</span>
+                                {% endif %}
+
+                                {% if profile.document_proof %}
+                                <br>
+                                <a href="{{ profile.document_proof.url }}" target="_blank"
+                                    style="color: var(--primary); text-decoration: underline; font-size: 0.9em;">View
+                                    Doc</a>
+                                {% endif %}
+                            </td>
+                            <td style="display: flex; gap: 10px; align-items: center;">
+                                {% if profile.verification_status == 'PENDING' %}
+                                <a href="{% url 'verify_merchant' profile.user.id 'approve' %}" class="btn"
+                                    style="background: #059669; color: white; padding: 5px 15px; font-size: 0.85rem; border-radius: 4px; text-decoration: none;">Approve</a>
+                                <a href="{% url 'verify_merchant' profile.user.id 'reject' %}" class="btn"
+                                    style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 5px 15px; font-size: 0.85rem; border-radius: 4px; text-decoration: none;">Reject</a>
+                                {% endif %}
+
+                                <form action="{% url 'delete_user' profile.user.id %}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this merchant?');"
+                                    style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-icon delete-btn" title="Delete User">
+                                        <ion-icon name="trash-outline"></ion-icon>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">No merchant registrations found.</p>
+            {% endif %}
+
+            <!-- Regular Users Section -->
+            <h2 style="margin-top: 3rem; margin-bottom: 1rem; color: var(--text-main); font-size: 1.5rem;">Registered
+                Users</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email Address</th>
+                            <th>Phone No</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile in regular_users %}
+                        <tr class="user-row">
+                            <td>{{ profile.user.username }}</td>
+                            <td>{{ profile.user.email }}</td>
+                            <td>{{ profile.phone_number|default:"-" }}</td>
+                            <td>
+                                {% if profile.trust_score < 50 %} <span
+                                    style="color: red; font-weight: bold; background: rgba(239, 68, 68, 0.1); padding: 4px 8px; border-radius: 4px;">
+                                    Suspicious</span>
+                                    {% else %}
+                                    <span
+                                        style="color: #10b981; font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 4px;">Active</span>
+                                    {% endif %}
+                            </td>
+                            <td>
+                                <form action="{% url 'delete_user' profile.user.id %}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this user?');"
+                                    style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-icon delete-btn" title="Delete User">
+                                        <ion-icon name="trash-outline"></ion-icon>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 2rem;">No regular users found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify PIN - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/send.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .pin-input {
+            letter-spacing: 0.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="send-section">
+        <div class="container">
+            <div class="send-card">
+                <h2>Enter Transaction PIN</h2>
+                <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">
+                    Please enter your 4-6 digit PIN to verify this transaction.
+                </p>
+
+                {% if messages %}
+                <div style="margin-bottom: 1rem; text-align: center; color: #ef4444;">
+                    {% for message in messages %}
+                    {{ message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="POST" onsubmit="calculateTime()">
+                    {% csrf_token %}
+                    <input type="hidden" name="time_taken" id="time_taken">
+                    <div class="input-group">
+                        <label style="text-align: center;">Security PIN</label>
+                        <div class="input-wrapper">
+                            <ion-icon name="lock-closed-outline"></ion-icon>
+                            <input type="password" name="pin" class="pin-input" placeholder="••••" maxlength="6"
+                                pattern="\d{4,6}" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="{% url 'send_money' %}" class="btn btn-secondary width-100"
+                            style="text-align:center;">Cancel</a>
+                        <button type="submit" class="btn btn-primary width-100">Verify & Pay</button>
+                    </div>
+                </form>
+
+                <script>
+                    const startTime = Date.now();
+                    function calculateTime() {
+                        const endTime = Date.now();
+                        const duration = (endTime - startTime) / 1000; // in seconds
+                        document.getElementById('time_taken').value = duration;
+                    }
+                </script>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <ion-icon name="shield-checkmark"></ion-icon>
+                        FraudShield
+                    </div>
+                    <p>Making digital payments safe for everyone. Join the secure revolution today.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><ion-icon name="call-outline"></ion-icon> 9645626283</p>
+                    <p><ion-icon name="mail-outline"></ion-icon> fraudshield@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

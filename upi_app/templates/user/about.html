@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/about.css' %}">
+    <!-- Ionicons for premium icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}" class="active">About Us</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a
+                            href="{% if user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}">Dashboard</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="nav-actions" style="display: flex; gap: 1rem;">
+                    <a href="{% if user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}"
+                        class="btn btn-secondary">
+                        Dashboard <ion-icon name="grid-outline"></ion-icon>
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">
+                        Logout <ion-icon name="log-out-outline"></ion-icon>
+                    </a>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-secondary">
+                    Login <ion-icon name="log-in-outline"></ion-icon>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- About Hero -->
+    <section class="about-hero">
+        <div class="container">
+            <h1>Securing the Future of <br><span class="highlight">Digital Payments</span></h1>
+            <p class="subtitle">We built FraudShield to bring enterprise-grade security to everyday UPI transactions,
+                making digital India safer for everyone.</p>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="container">
+            <div class="mission-grid">
+                <div class="mission-content">
+                    <h2>Our Mission</h2>
+                    <p>
+                        With the rapid adoption of digital payments, fraud has become increasingly sophisticated.
+                        Our mission is simple: to stay one step ahead of scammers.
+                    </p>
+                    <p>
+                        We leverage advanced AI and community-driven data to detect suspicious patterns in real-time,
+                        giving you the confidence to transact without fear.
+                    </p>
+                </div>
+                <div class="mission-visual">
+                    <div class="visual-card">
+                        <ion-icon name="globe-outline"></ion-icon>
+                        <h3>Global Vision</h3>
+                        <p>Protecting millions of transactions daily across the globe.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>2M+</h3>
+                    <p>Users Protected</p>
+                </div>
+                <div class="stat-box">
+                    <h3>99.99%</h3>
+                    <p>Uptime</p>
+                </div>
+                <div class="stat-box">
+                    <h3>$50M+</h3>
+                    <p>Saved from Fraud</p>
+                </div>
+                <div class="stat-box">
+                    <h3>24/7</h3>
+                    <p>Support Team</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-box">
+                <h2>Ready to secure your finances?</h2>
+                <p>Join the community today and never worry about UPI fraud again.</p>
+                <div class="cta-buttons">
+                    <a href="{% url 'register' %}" class="btn btn-primary">Get Started Now</a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <ion-icon name="shield-checkmark"></ion-icon>
+                        FraudShield
+                    </div>
+                    <p>Making digital payments safe for everyone. Join the secure revolution today.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><ion-icon name="call-outline"></ion-icon> 9645626283</p>
+                    <p><ion-icon name="mail-outline"></ion-icon> fraudshield@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

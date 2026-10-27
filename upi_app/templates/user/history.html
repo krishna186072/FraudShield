@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/history.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="{% url 'user_dashboard' %}"
+                        style="text-decoration: none; color: #94a3b8; font-weight: 500; transition: color 0.3s;">Dashboard</a>
+                    <a href="{% url 'about' %}"
+                        style="text-decoration: none; color: #94a3b8; font-weight: 500; transition: color 0.3s;">About
+                        Us</a>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        Logout <ion-icon name="log-out-outline"></ion-icon>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="history-section">
+        <div class="container">
+            <h2 style="margin-bottom: 2rem;">Recent Transactions</h2>
+            <div class="history-container">
+                <ul class="transaction-list">
+                    {% for txn in transactions %}
+                    <li class="transaction-item">
+                        <div class="t-info">
+                            <div class="t-icon">
+                                {% if txn.sender == user %}
+                                <ion-icon name="arrow-up-outline" style="color: red;"></ion-icon>
+                                {% else %}
+                                <ion-icon name="arrow-down-outline" style="color: green;"></ion-icon>
+                                {% endif %}
+                            </div>
+                            <div class="t-details">
+                                {% if txn.sender == user %}
+                                <h4>Paid to {{ txn.receiver_upi_id }}</h4>
+                                {% else %}
+                                <h4>Received from {{ txn.sender.username }}</h4>
+                                {% endif %}
+                                <p>{{ txn.timestamp|date:"M d, Y • h:i A" }}</p>
+
+                                {% if txn.status == 'BLOCKED' %}
+                                <span style="color: red; font-size: 0.8rem; font-weight: bold;">● Blocked</span>
+                                {% elif txn.status == 'PENDING' %}
+                                <span style="color: orange; font-size: 0.8rem;">● Pending</span>
+                                {% elif txn.status == 'SUCCESS' and txn.is_suspicious %}
+                                <span style="color: #d32f2f; font-size: 0.8rem; font-weight: bold;">● Verified High
+                                    Risk</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if txn.sender == user %}
+                        <div class="t-amount debit">- ₹{{ txn.amount }}</div>
+                        {% else %}
+                        <div class="t-amount credit">+ ₹{{ txn.amount }}</div>
+                        {% endif %}
+
+                        <div class="t-actions" style="display: flex; gap: 8px; align-items: center;">
+                            {% if txn.is_suspicious %}
+                            <div class="badge"
+                                style="background: #ff4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">
+                                <ion-icon name="warning"></ion-icon> Flagged
+                            </div>
+                            {% endif %}
+
+                            {% if txn.is_reported %}
+                            <span
+                                style="font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; background: rgba(0, 128, 0, 0.1); border: 1px solid green; color: green; cursor: default;">
+                                Reported
+                            </span>
+                            {% else %}
+                            <a href="{% url 'feedback' %}?report={{ txn.id }}" title="Report Issue"
+                                style="text-decoration: none; font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); transition: all 0.2s;">
+                                Report
+                            </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li style="text-align: center; padding: 2rem;">No transactions found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div style="margin-top:2rem; text-align:center;">
+                <a href="{% url 'user_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <ion-icon name="shield-checkmark"></ion-icon>
+                        FraudShield
+                    </div>
+                    <p>Making digital payments safe for everyone. Join the secure revolution today.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><ion-icon name="call-outline"></ion-icon> 9645626283</p>
+                    <p><ion-icon name="mail-outline"></ion-icon> fraudshield@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+/* Admin Theme - Unifies Admin with User Styles */
+@import url('../user/user.css');
+
+/* Centralize dashboard actions in admin panel */
+.dashboard-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* ------------------------------------------------------------------
+   Styles from manage_users.css (Tables)
+   ------------------------------------------------------------------ */
+.table-container {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    overflow-x: auto;
+    margin-top: 2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-main);
+}
+
+th,
+td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+th {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.user-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.delete-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.delete-btn:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* ------------------------------------------------------------------
+   Styles from view_feedbacks.css (Feedback Items)
+   ------------------------------------------------------------------ */
+.feedbacks-container {
+    display: grid;
+    gap: 2rem;
+}
+
+.feedback-item {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 1rem;
+}
+
+.user-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+    color: var(--primary);
+}
+
+.user-info span {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.feedback-text {
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+.reply-section {
+    background: rgba(2, 6, 23, 0.5);
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.reply-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    resize: none;
+    font-family: inherit;
+}
+
+.reply-input:focus {
+    outline: none;
+}
+
+.reply-actions {
+    display: flex;
+    justify-content: flex-end;
+}

@@ -1,0 +1,94 @@
+@import url('user.css');
+
+.history-section {
+    padding: 8rem 0;
+}
+
+.history-container {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    overflow: hidden;
+}
+
+.transaction-list {
+    list-style: none;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    transition: background 0.2s;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.t-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.t-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+}
+
+.t-details h4 {
+    margin-bottom: 0.2rem;
+}
+
+.t-details p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.t-amount {
+    font-weight: 700;
+}
+
+.t-amount.debit {
+    color: var(--text-main);
+}
+
+.t-amount.credit {
+    color: var(--accent);
+}
+
+.t-actions {
+    margin-left: 1rem;
+}
+
+.report-btn {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s;
+}
+
+.report-btn:hover {
+    background: var(--danger);
+    color: white;
+}

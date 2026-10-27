@@ -1,0 +1,252 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/style.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .verify-section {
+            flex: 1;
+            padding: 8rem 0;
+            background: radial-gradient(circle at center top, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        }
+
+        .verify-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            max-width: 500px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .verify-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-desc {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.8rem;
+            padding: 1rem;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .otp-container {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .otp-box {
+            width: 50px;
+            height: 60px;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.8rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .otp-box:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .random-otp {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px dashed var(--accent);
+            padding: 1rem;
+            border-radius: 0.8rem;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        .messages li {
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <div class="nav-actions">
+                    <a href="{% url 'profile' %}" class="btn btn-secondary">
+                        <ion-icon name="arrow-back-outline"></ion-icon> Back to Profile
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="verify-section">
+        <div class="container">
+            <div class="verify-card">
+                <div class="verify-icon">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                </div>
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                {% if step == 'pan' %}
+                <!-- Step 1: PAN Number -->
+                <h2 class="step-title">Verify Identity</h2>
+                <p class="step-desc">Please enter your PAN number to proceed with account verification.</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="step" value="pan">
+                    <div class="input-group">
+                        <label>PAN Number</label>
+                        <input type="text" name="pan_number" value="{{ pan_number|default:'' }}"
+                            placeholder="ABCDE1234F" maxlength="10" required style="text-transform: uppercase;">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary width-100">
+                        Next <ion-icon name="arrow-forward-outline"></ion-icon>
+                    </button>
+                </form>
+
+                {% elif step == 'otp' %}
+                <!-- Step 2: OTP Verification -->
+                <h2 class="step-title">Verification Code</h2>
+                <p class="step-desc">Enter the otp sent to {{ phone_obfuscated }}</p>
+
+                <div class="random-otp">
+                    Verification Code: {{ generated_otp }}
+                </div>
+
+                <form method="POST" id="otp-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="step" value="otp">
+                    <input type="hidden" name="pan_number" value="{{ pan_number }}">
+                    <input type="hidden" name="generated_otp" value="{{ generated_otp }}">
+                    <input type="hidden" name="phone_obfuscated" value="{{ phone_obfuscated }}">
+
+                    <div class="otp-container">
+                        <input type="text" name="otp1" maxlength="1" class="otp-box" required
+                            onkeyup="moveToNext(this, 'otp2')">
+                        <input type="text" name="otp2" id="otp2" maxlength="1" class="otp-box" required
+                            onkeyup="moveToNext(this, 'otp3')">
+                        <input type="text" name="otp3" id="otp3" maxlength="1" class="otp-box" required
+                            onkeyup="moveToNext(this, 'otp4')">
+                        <input type="text" name="otp4" id="otp4" maxlength="1" class="otp-box" required
+                            onkeyup="moveToNext(this, 'otp5')">
+                        <input type="text" name="otp5" id="otp5" maxlength="1" class="otp-box" required
+                            onkeyup="moveToNext(this, 'otp6')">
+                        <input type="text" name="otp6" id="otp6" maxlength="1" class="otp-box" required
+                            onkeyup="moveToNext(this, null)">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary width-100">
+                        Verify & Complete <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    </button>
+                </form>
+
+                <script>
+                    function moveToNext(current, nextFieldID) {
+                        if (current.value.length >= 1) {
+                            if (nextFieldID) {
+                                document.getElementById(nextFieldID).focus();
+                            }
+                        }
+                    }
+
+                    // Pre-fill dummy code on click for testing convenience if needed? 
+                    // No, let users type it.
+                </script>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

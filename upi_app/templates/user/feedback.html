@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Feedback - FraudShield</title>
+    <link rel="stylesheet" href="{% static 'user/feedback.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                    FraudShield
+                </div>
+                <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="{% url 'user_dashboard' %}"
+                        style="text-decoration: none; color: #94a3b8; font-weight: 500; transition: color 0.3s;">Dashboard</a>
+                    <a href="{% url 'about' %}"
+                        style="text-decoration: none; color: #94a3b8; font-weight: 500; transition: color 0.3s;">About
+                        Us</a>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        Logout <ion-icon name="log-out-outline"></ion-icon>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="feedback-section">
+        <div class="container">
+            <div class="feedback-card">
+                <h2>We Value Your Feedback</h2>
+                <p>Help us improve your experience. Let us know what you think!</p>
+
+                <!-- Feedback Form -->
+                <form method="POST" style="margin-bottom: 3rem;">
+                    {% csrf_token %}
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-muted);">Details</label>
+                    <textarea name="message" placeholder="Describe your experience or suggestion..."
+                        required>{{ default_message }}</textarea>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary width-100">Submit Feedback</button>
+                        <a href="{% url 'user_dashboard' %}" class="btn btn-secondary width-100"
+                            style="text-align:center;">Cancel</a>
+                    </div>
+                </form>
+
+                <!-- Feedback History -->
+                {% if user_feedbacks %}
+                <h3 style="margin-bottom: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">My
+                    Feedbacks</h3>
+                <div class="feedback-history-list">
+                    {% for feedback in user_feedbacks %}
+                    <div class="feedback-history-item"
+                        style="background: var(--bg-body); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                        <div class="feedback-content" style="margin-bottom: 1rem;">
+                            <p style="color: var(--text-main);">{{ feedback.message }}</p>
+                            <small style="color: var(--text-muted);">{{ feedback.created_at|date:"M d, Y" }}</small>
+                        </div>
+
+                        {% if feedback.admin_reply %}
+                        <div class="admin-reply">
+                            <div class="reply-header">
+                                <ion-icon name="arrow-undo"></ion-icon>
+                                Admin Reply
+                            </div>
+                            <div class="reply-content">
+                                {{ feedback.admin_reply }}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div style="margin-top: 0.5rem;">
+                            <span
+                                style="background: var(--bg-card); color: var(--text-muted); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; border: 1px solid var(--border);">
+                                <ion-icon name="time-outline" style="vertical-align: middle;"></ion-icon> Awaiting Reply
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <ion-icon name="shield-checkmark"></ion-icon>
+                        FraudShield
+                    </div>
+                    <p>Making digital payments safe for everyone. Join the secure revolution today.</p>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><ion-icon name="call-outline"></ion-icon> 9645626283</p>
+                    <p><ion-icon name="mail-outline"></ion-icon> fraudshield@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 FraudShield Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
